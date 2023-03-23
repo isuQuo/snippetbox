@@ -1,0 +1,10 @@
+{{ define "content" }}
+  <h1>Latest Snippets</h1>
+  {{ if .Snippets }}
+    {{ range .Snippets }}
+      <!-- render each snippet here -->
+    {{ end }}
+  {{ else }}
+    <p>No snippets have been created yet.</p>
+  {{ end }}
+{{ end }}
