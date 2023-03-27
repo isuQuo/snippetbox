@@ -21,6 +21,8 @@ jobs:
     - name: Start Go application
       run: |
         go run ./cmd/web &
+
+    - run: npm install puppeteer
         
     - name: Take screenshot
       run: node screenshot.js
