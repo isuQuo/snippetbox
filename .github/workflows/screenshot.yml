@@ -20,7 +20,7 @@ jobs:
         
     - name: Start Go application
       run: |
-        go run ./cmd/web &
+        nohup go run ./cmd/web > /dev/null 2>&1 &
 
     - run: npm install puppeteer && npm install wait-on
         
