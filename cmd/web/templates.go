@@ -29,14 +29,17 @@ func newTemplateCache() (map[string]*template.Template, error) {
 		// Extract the file name (like 'index.html') from the full file path
 		name := filepath.Base(page)
 
-		files := []string{
-			"./ui/html/layouts/main.html",
-			"./ui/html/partials/nav.html",
-			page,
+		ts, err := template.ParseFiles("./ui/html/layouts/main.html")
+		if err != nil {
+			return nil, err
 		}
 
-		// Parse the files into a template set
-		ts, err := template.ParseFiles(files...)
+		ts, err = ts.ParseGlob("./ui/html/partials/*.html")
+		if err != nil {
+			return nil, err
+		}
+
+		ts, err = ts.ParseFiles(page)
 		if err != nil {
 			return nil, err
 		}
