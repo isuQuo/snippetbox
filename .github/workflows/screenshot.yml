@@ -1,0 +1,25 @@
+name: Take a screenshot of my webpage
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  screenshot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install dependencies
+        run: npm install puppeteer
+      - name: Take a screenshot
+        run: |
+          npx puppeteer screenshot --full-page --path screenshots/latest.png http://localhost:8080
+      - name: Update README.md
+        run: echo "![](screenshots/latest.png)" > README.md
+      - name: Commit changes
+        run: |
+          git add screenshots/latest.png README.md
+          git commit -m "Update latest screenshot"
+          git push
