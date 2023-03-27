@@ -12,17 +12,23 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
       
-    - name: Setup Go
-      uses: actions/setup-go@v2
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
       with:
-        go-version: '1.20.x'
+        node-version: '16.x'
         
     - name: Start Go application
       run: |
-        go run ./cmd/web &
+        go build
+        ./your-app-name &
         
-    - name: Take screenshot and upload as artifact
+    - name: Take screenshot
       run: node screenshot.js
+      env:
+        CHROME_BIN: chromium-browser
+        DISPLAY: :99
+
+    - name: Upload screenshot artifact
       uses: actions/upload-artifact@v2
       with:
         name: screenshot
