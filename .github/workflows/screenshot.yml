@@ -22,7 +22,7 @@ jobs:
       run: |
         go run ./cmd/web &
 
-    - run: npm install puppeteer && wait-on
+    - run: npm install puppeteer && npm install wait-on
         
     - name: Take screenshot
       run: node screenshot.js
