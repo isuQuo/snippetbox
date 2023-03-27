@@ -2,7 +2,7 @@ name: Take Screenshot
 
 on:
   push:
-    branches: [screenshots]
+    branches: [screenshot]
   workflow_dispatch:
 
 jobs:
