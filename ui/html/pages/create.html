@@ -1,12 +1,12 @@
 {{define "content"}}
-<form class="mx-auto max-w-md mt-8">
+<form action="/snippet/create" method="POST" class="mx-auto max-w-md mt-8">
     <div class="mb-4">
         <label class="block text-gray-700 font-bold mb-2" for="title">
             Title
         </label>
         <input
             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="title" type="text" placeholder="Enter title here...">
+            id="title" name="title" type="text" placeholder="Enter title here...">
     </div>
     <div class="mb-4">
         <label class="block text-gray-700 font-bold mb-2" for="content">
@@ -14,32 +14,28 @@
         </label>
         <textarea
             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="content" placeholder="Enter content here..."></textarea>
+            id="content" name="content" placeholder="Enter content here..."></textarea>
     </div>
     <div class="mb-4 flex justify-between">
         <div class="flex items-center">
-            <input class="mr-2 leading-tight" type="radio" name="radio" id="radio1">
+            <input class="mr-2 leading-tight" type="radio" name="radio" id="radio1" value="365">
             <label class="block text-gray-700 font-bold" for="radio1">
-                Option 1
+                One Year
             </label>
         </div>
         <div class="flex items-center">
-            <input class="mr-2 leading-tight" type="radio" name="radio" id="radio2">
+            <input class="mr-2 leading-tight" type="radio" name="radio" id="radio2" value="7">
             <label class="block text-gray-700 font-bold" for="radio2">
-                Option 2
+                One Week
             </label>
         </div>
         <div class="flex items-center">
-            <input class="mr-2 leading-tight" type="radio" name="radio" id="radio3">
+            <input class="mr-2 leading-tight" type="radio" name="radio" id="radio3" value="1">
             <label class="block text-gray-700 font-bold" for="radio3">
-                Option 3
+                One Day
             </label>
         </div>
     </div>
-    <button
-        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-        type="button">
-        Submit
-    </button>
+    <input class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" value="Submit">
 </form>
 {{end}}
