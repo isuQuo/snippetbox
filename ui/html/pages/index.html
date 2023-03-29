@@ -7,7 +7,7 @@
       <h1 class="text-4xl mb-8">Latest Snippets</h1>
       {{ if .Snippets }}
       {{ range .Snippets }}
-      <a href="/snippet/view?id={{.ID}}">
+      <a href="/snippet/view/{{.ID}}">
         <div class="bg-white p-16 rounded-lg shadow-lg mb-16">
           <div class="metadata flex justify-between items-center mb-8 flex-col">
             <strong class="text-3xl font-medium">{{.Title}}</strong>
