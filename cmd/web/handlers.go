@@ -5,10 +5,18 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/isuquo/snippetbox/internal/models"
 	"github.com/julienschmidt/httprouter"
 )
+
+type snippetCreateForm struct {
+	Title       string
+	Content     string
+	Expires     int
+	FieldErrors map[string]string
+}
 
 // home is a simple HTTP handler function which writes a response.
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -61,6 +69,10 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 func (app *application) snippetCreateForm(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 
+	data.Form = snippetCreateForm{
+		Expires: 365,
+	}
+
 	app.render(w, http.StatusOK, "create.html", data)
 }
 
@@ -79,17 +91,32 @@ func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	title := r.PostForm.Get("title")
-	content := r.PostForm.Get("content")
-
 	expires, err := strconv.Atoi(r.PostForm.Get("radio"))
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
 
+	form := snippetCreateForm{
+		Title:       r.PostForm.Get("title"),
+		Content:     r.PostForm.Get("content"),
+		Expires:     expires,
+		FieldErrors: map[string]string{},
+	}
+
+	if strings.TrimSpace(form.Title) == "" {
+		form.FieldErrors["title"] = "This field cannot be blank"
+	}
+
+	if len(form.FieldErrors) > 0 {
+		data := app.newTemplateData(r)
+		data.Form = form
+		app.render(w, http.StatusUnprocessableEntity, "create.html", data)
+		return
+	}
+
 	// Insert the snippet data into the database.
-	id, err := app.snippets.Insert(title, content, expires)
+	id, err := app.snippets.Insert(form.Title, form.Content, form.Expires)
 	if err != nil {
 		app.serverError(w, err)
 		return
