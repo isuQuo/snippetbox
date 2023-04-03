@@ -112,5 +112,8 @@ func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Use the app.session.Put() method to add a message to the session.
+	app.sessionManager.Put(r.Context(), "flash", "Snippet successfully created!")
+
 	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)
 }
