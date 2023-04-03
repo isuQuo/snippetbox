@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"html/template"
 	"log"
@@ -57,14 +58,23 @@ func main() {
 		sessionManager: sessionManager,
 	}
 
+	// Create a TLS config struct
+	tlsConfig := &tls.Config{
+		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256}, // Prefer X25519, then CurveP256
+	}
+
 	srv := &http.Server{
-		Addr:     "127.0.0.1:8080",
-		ErrorLog: errorLog,
-		Handler:  app.routes(),
+		Addr:         "127.0.0.1:8080",
+		ErrorLog:     errorLog,
+		Handler:      app.routes(),
+		TLSConfig:    tlsConfig,
+		IdleTimeout:  time.Minute,      // IdleTimeout is the maximum amount of time to wait for the next request when keep-alives are enabled.
+		ReadTimeout:  5 * time.Second,  // ReadTimeout is the maximum duration for reading the entire request, including the body.
+		WriteTimeout: 10 * time.Second, // WriteTimeout is the maximum duration before timing out writes of the response.
 	}
 
 	infoLog.Println("Starting server on :8080")
-	err = srv.ListenAndServe()
+	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
 	errorLog.Fatal(err)
 }
 
