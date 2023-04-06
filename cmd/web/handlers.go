@@ -25,6 +25,12 @@ type userSignUpForm struct {
 	validator.Validator `form:"-"` // This field is not a form field
 }
 
+type userSignInForm struct {
+	Email               string     `form:"email"`
+	Password            string     `form:"password"`
+	validator.Validator `form:"-"` // This field is not a form field
+}
+
 // home is a simple HTTP handler function which writes a response.
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	// Because httprouter matches the "/" path exactly, we can now remove the
@@ -175,12 +181,56 @@ func (app *application) signupUser(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) signinUserForm(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
+	data.Form = userSignInForm{}
 
 	app.render(w, http.StatusOK, "signin.html", data)
 }
 
 func (app *application) signinUser(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Authenticate and login the user")
+	var form userSignInForm
+
+	err := app.decodePostForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
+	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
+	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
+
+	if !form.Valid() {
+		data := app.newTemplateData(r)
+		data.Form = form
+		app.render(w, http.StatusUnprocessableEntity, "signin.html", data)
+		return
+	}
+
+	id, err := app.users.Authenticate(form.Email, form.Password)
+	if err != nil {
+		if errors.Is(err, models.ErrInvalidCredentials) {
+			form.AddNonFieldError("Email or password is incorrect")
+
+			data := app.newTemplateData(r)
+			data.Form = form
+			app.render(w, http.StatusUnprocessableEntity, "signin.html", data)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+
+	// Renew the session token to prevent session fixation attacks.
+	err = app.sessionManager.RenewToken(r.Context())
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	app.sessionManager.Put(r.Context(), "authenticatedUserID", id)
+	app.sessionManager.Put(r.Context(), "flash", "You've been logged in successfully!")
+
+	http.Redirect(w, r, "/snippet/create", http.StatusSeeOther)
 }
 
 func (app *application) signoutUser(w http.ResponseWriter, r *http.Request) {
