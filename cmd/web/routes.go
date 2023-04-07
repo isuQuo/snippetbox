@@ -28,23 +28,23 @@ func (app *application) routes() http.Handler {
 		app.notFound(w)
 	})
 
-	dynamic := alice.New(app.sessionManager.LoadAndSave)
-
 	//fileServer := http.FileServer(http.Dir("./ui/static/"))
 	//router.Handler(http.MethodGet, "/static/*filepath", http.StripPrefix("/static", fileServer))
 
-	// Snippet routes.
+	dynamic := alice.New(app.sessionManager.LoadAndSave)
+
 	router.Handler(http.MethodGet, "/", dynamic.ThenFunc(app.home))
 	router.Handler(http.MethodGet, "/snippet/view/:id", dynamic.ThenFunc(app.snippetView))
-	router.Handler(http.MethodGet, "/snippet/create", dynamic.ThenFunc(app.snippetCreateForm))
-	router.Handler(http.MethodPost, "/snippet/create", dynamic.ThenFunc(app.snippetCreate))
-
-	// User authentication and profile routes.
 	router.Handler(http.MethodGet, "/user/signup", dynamic.ThenFunc(app.signupUserForm))
 	router.Handler(http.MethodPost, "/user/signup", dynamic.ThenFunc(app.signupUser))
 	router.Handler(http.MethodGet, "/user/signin", dynamic.ThenFunc(app.signinUserForm))
 	router.Handler(http.MethodPost, "/user/signin", dynamic.ThenFunc(app.signinUser))
-	router.Handler(http.MethodPost, "/user/signout", dynamic.ThenFunc(app.signoutUser))
+
+	protected := dynamic.Append(app.requireAuthentication)
+
+	router.Handler(http.MethodGet, "/snippet/create", protected.ThenFunc(app.snippetCreateForm))
+	router.Handler(http.MethodPost, "/snippet/create", protected.ThenFunc(app.snippetCreate))
+	router.Handler(http.MethodPost, "/user/signout", protected.ThenFunc(app.signoutUser))
 
 	// Create a middleware chain containing our 'standard' middleware
 	// which will be used by every request our application receives.
