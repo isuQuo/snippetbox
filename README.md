@@ -16,7 +16,10 @@
 - [x] User authentication
 - [x] Using request context
 - [x] Optional Go features
-
-# TODO
 - [ ] Tests
 - [ ] Guided exercises
+
+# TODO
+- Finish chapters
+- Implement Github actions for taking screenshots of webpage views and place in README.md.
+    - This will display the status of the webpage.
