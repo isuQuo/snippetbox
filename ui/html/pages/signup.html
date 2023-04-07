@@ -1,5 +1,6 @@
 {{define "content"}}
 <form action="/user/signup" method="POST" class="mx-auto max-w-md mt-8">
+    <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
     <div class="mb-4">
         <label class="block text-gray-700 font-bold mb-2" for="name">
             Name
